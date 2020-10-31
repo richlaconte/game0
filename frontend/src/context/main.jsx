@@ -8,11 +8,18 @@ const MainContextProvider = ({ children }) => {
     const [moves, setMoves] = useState(3)
     const [board, setBoard] = useState([])
 
+    const message = (type, payload) => {
+        return JSON.stringify({
+            type,
+            payload
+        })
+    }
+
     useEffect(() => {
         const socket = new WebSocket('ws://localhost:8080')
         // Connection opened
         socket.addEventListener('open', function (event) {
-            //socket.send('Hello Server!')
+
         })
         // Listen for messages
         socket.addEventListener('message', function (event) {
@@ -57,35 +64,13 @@ const MainContextProvider = ({ children }) => {
     }
 
     const spawnCard = (card) => {
-        if (board[11][11].isEmpty) {
-            let newBoard = board
-            newBoard[11][11].occupant = card
-            newBoard[11][11].occupant.allegiance = 'friendly'
-            newBoard[11][11].isEmpty = false
-
-            setBoard([...newBoard])
-
-            let newHand = hand.filter((item) => item !== card)
-
-            setHand(newHand)
-        } else {
-            alert('spawn location occupied')
-        }
+        console.log(card)
+        socket.send(message('spawnCard', card))
     }
 
     const moveCard = (originalX, originalY, newX, newY) => {
 
-        if ((Math.abs(newY - originalY) + Math.abs(newX - originalX)) > moves) {
-            alert(`not enough moves remaining`)
-            return
-        }
-
-        let newBoard = board
-        newBoard[newY][newX] = newBoard[originalY][originalX]
-        newBoard[originalY][originalX] = { isEmpty: true }
-        newBoard[newY][newX].occupant.movesLeft -= Math.abs(newY - originalY) + Math.abs(newX - originalX)
-
-        setBoard([...newBoard])
+        socket.send(message('moveCard', { originalX, originalY, newX, newY }))
         setCheckMoves({
             active: false,
             x: 0,
