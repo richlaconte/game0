@@ -22,6 +22,7 @@ wss.on('connection', function connection(ws) {
     console.log(ws.id)
     console.log('new connection')
     ws.on('message', function incoming(message) {
+        console.log('message:', messageObject.name)
         const messageObject = JSON.parse(message)
         addMessage(messageObject.name, messageObject.content)
         wss.clients.forEach(function each(client) {
